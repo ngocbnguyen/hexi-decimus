@@ -23,7 +23,7 @@ A cross-platform mobile application that helps users organize and manage their j
 ### Clone the repository
 
 ```bash
-git clone [https://github.com/your-organization/application-tracker.git](https://github.com/ngocbnguyen/hexi-decimus.git)
+git clone https://github.com/ngocbnguyen/hexi-decimus.git
 ```
 
 ### Create your feature branch
