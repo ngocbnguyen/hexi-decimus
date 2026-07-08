@@ -35,8 +35,8 @@ class NavigationHub extends StatelessWidget {
               label: 'Resumes',
               onPressed: () {
                 Navigator.of(context).pop(); 
-                // TODO: Update route to match your team's resume page
-                // Navigator.pushNamed(context, '/resumes');
+                // Route activated as stated in Sprint Report 2
+                Navigator.pushNamed(context, '/resumes');
               },
             ),
             const SizedBox(height: 12),
@@ -46,8 +46,8 @@ class NavigationHub extends StatelessWidget {
               label: 'Job Profiles',
               onPressed: () {
                 Navigator.of(context).pop();
-                // TODO: Update route to match your team's job profiles page
-                // Navigator.pushNamed(context, '/jobs');
+                // Route activated as stated in Sprint Report 2
+                Navigator.pushNamed(context, '/jobs');
               },
             ),
             const SizedBox(height: 12),
@@ -57,8 +57,8 @@ class NavigationHub extends StatelessWidget {
               label: 'Cover Letters',
               onPressed: () {
                 Navigator.of(context).pop();
-                // TODO: Update route to match your team's cover letters page
-                // Navigator.pushNamed(context, '/cover_letters');
+                // Route activated as stated in Sprint Report 2
+                Navigator.pushNamed(context, '/cover_letters');
               },
             ),
             const SizedBox(height: 16),
