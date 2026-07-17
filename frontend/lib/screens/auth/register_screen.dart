@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/routes.dart';
+import '../../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,11 +14,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
-  void _handleRegister() {
+  void _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Connect to backend AuthService registration
-      Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final userData = await AuthService.register(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+
+        if (mounted) {
+          // Success: Navigate to the Dashboard
+          Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          final errorMessage = e.toString().replaceAll('Exception: ', '');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -51,6 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 TextFormField(
                   controller: _nameController,
+                  enabled: !_isLoading,
                   decoration: const InputDecoration(
                     labelText: 'Full Name',
                     prefixIcon: Icon(Icons.person_outline),
@@ -61,6 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  enabled: !_isLoading,
                   decoration: const InputDecoration(
                     labelText: 'Email Address',
                     prefixIcon: Icon(Icons.email_outlined),
@@ -76,6 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
+                  enabled: !_isLoading,
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock_outlined),
@@ -83,9 +116,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (value) => value == null || value.length < 6 ? 'Password must be 6+ characters' : null,
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _handleRegister,
-                  child: const Text('Create Account'),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleRegister,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('Create Account'),
+                  ),
                 ),
               ],
             ),
