@@ -1,4 +1,4 @@
-package com.applicationtracker.backend;
+package com.hexidecimus;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.applicationtracker.backend;
+package com.hexidecimus;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
