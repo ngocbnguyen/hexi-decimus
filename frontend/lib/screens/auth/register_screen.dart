@@ -30,7 +30,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         if (mounted) {
-          // Success: Navigate to the Dashboard
           Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
         }
       } catch (e) {
@@ -55,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -132,6 +131,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         : const Text('Create Account'),
                   ),
                 ),
+                const SizedBox(height: 16),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Already have an account? '),
+                      GestureDetector(
+                        onTap: _isLoading
+                            ? null
+                            : () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+                        child: Text(
+                          'Sign In',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
