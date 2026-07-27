@@ -317,6 +317,7 @@ class _AlertsViewState extends State<AlertsView> {
                   icon: const Icon(Icons.alarm_add, size: 20),
                   label: const Text('Add Alert'),
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   ),
                 ),

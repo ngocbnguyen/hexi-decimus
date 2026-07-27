@@ -310,6 +310,7 @@ class _DocumentsViewState extends State<DocumentsView> {
                   icon: const Icon(Icons.upload_file, size: 20),
                   label: const Text('Upload File'),
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   ),
                 ),

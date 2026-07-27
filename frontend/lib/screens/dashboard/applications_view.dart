@@ -346,6 +346,7 @@ class _ApplicationsViewState extends State<ApplicationsView> {
                   icon: const Icon(Icons.add, size: 20),
                   label: const Text('Add Job'),
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   ),
                 ),
