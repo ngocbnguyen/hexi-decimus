@@ -5,10 +5,7 @@ import '../../services/job_service.dart';
 class AlertsView extends StatefulWidget {
   final Map<String, dynamic> user;
 
-  const AlertsView({
-    super.key,
-    required this.user,
-  });
+  const AlertsView({super.key, required this.user});
 
   @override
   State<AlertsView> createState() => _AlertsViewState();
@@ -70,7 +67,8 @@ class _AlertsViewState extends State<AlertsView> {
     final now = DateTime.now();
     setState(() {
       _filteredAlerts = _allAlerts.where((alert) {
-        final alertDate = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
+        final alertDate =
+            DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
         final isSent = alert['isSent'] ?? false;
         final differenceInDays = alertDate.difference(now).inDays;
 
@@ -99,7 +97,9 @@ class _AlertsViewState extends State<AlertsView> {
     if (_applications.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please add at least one job application before scheduling follow-ups.'),
+          content: Text(
+            'Please add at least one job application before scheduling follow-ups.',
+          ),
           backgroundColor: Colors.orange,
         ),
       );
@@ -117,10 +117,15 @@ class _AlertsViewState extends State<AlertsView> {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: Text(
                 'Schedule Follow Up',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               content: Form(
                 key: _formKey,
@@ -129,11 +134,15 @@ class _AlertsViewState extends State<AlertsView> {
                   children: [
                     DropdownButtonFormField<int>(
                       value: _selectedApplicationId,
-                      decoration: const InputDecoration(labelText: 'Job Application'),
+                      decoration: const InputDecoration(
+                        labelText: 'Job Application',
+                      ),
                       items: _applications.map((app) {
                         return DropdownMenuItem(
                           value: app['applicationId'] as int,
-                          child: Text('${app['companyName']} - ${app['jobTitle']}'),
+                          child: Text(
+                            '${app['companyName']} - ${app['jobTitle']}',
+                          ),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -151,7 +160,9 @@ class _AlertsViewState extends State<AlertsView> {
                         labelText: 'Reminder Message',
                         prefixIcon: Icon(Icons.message_outlined),
                       ),
-                      validator: (value) => value == null || value.isEmpty ? 'Message is required' : null,
+                      validator: (value) => value == null || value.isEmpty
+                          ? 'Message is required'
+                          : null,
                     ),
                     const SizedBox(height: 16),
                     // Date picker row
@@ -297,45 +308,50 @@ class _AlertsViewState extends State<AlertsView> {
                 Text(
                   'Follow Up Alerts',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 ElevatedButton.icon(
                   onPressed: _showAddAlertSheet,
                   icon: const Icon(Icons.alarm_add, size: 20),
                   label: const Text('Add Alert'),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-  
+
           // Filter tabs
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Row(
-              children: [
-                'Upcoming',
-                'Due Today',
-                'Overdue',
-                'Completed',
-              ].map((tabName) {
+              children: ['Upcoming', 'Due Today', 'Overdue', 'Completed'].map((
+                tabName,
+              ) {
                 final isSelected = _selectedTab == tabName;
                 final count = _allAlerts.where((alert) {
-                  final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
+                  final date =
+                      DateTime.tryParse(alert['alertDate'] ?? '') ??
+                      DateTime.now();
                   final isSent = alert['isSent'] ?? false;
                   final difference = date.difference(DateTime.now()).inDays;
-  
+
                   if (tabName == 'Completed') return isSent;
                   if (tabName == 'Due Today') return !isSent && difference == 0;
                   if (tabName == 'Overdue') return !isSent && difference < 0;
                   return !isSent && difference > 0;
                 }).length;
-  
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: ChoiceChip(
@@ -347,7 +363,7 @@ class _AlertsViewState extends State<AlertsView> {
               }).toList(),
             ),
           ),
-  
+
           // Alerts List
           _isLoading
               ? const Padding(
@@ -355,91 +371,123 @@ class _AlertsViewState extends State<AlertsView> {
                   child: Center(child: CircularProgressIndicator()),
                 )
               : _errorMessage.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40.0),
-                      child: Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red))),
-                    )
-                  : _filteredAlerts.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 60.0),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey[400]),
-                                const SizedBox(height: 16),
-                                Text('No reminders in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
-                              ],
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                          itemCount: _filteredAlerts.length,
-                          itemBuilder: (context, index) {
-                            final alert = _filteredAlerts[index];
-                            final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
-                            final now = DateTime.now();
-                            final difference = date.difference(now).inDays;
-  
-                            String daysText;
-                            Color statusColor;
-                            if (alert['isSent'] == true) {
-                              daysText = 'Completed / Sent';
-                              statusColor = Colors.grey;
-                            } else if (difference < 0) {
-                              daysText = 'Overdue by ${difference.abs()} days';
-                              statusColor = Colors.redAccent;
-                            } else if (difference == 0) {
-                              daysText = 'Due Today';
-                              statusColor = Colors.orange;
-                            } else {
-                              daysText = 'In $difference days';
-                              statusColor = Colors.green;
-                            }
-  
-                            // Match linked application
-                            final app = _applications.firstWhere(
-                              (a) => a['applicationId'] == alert['applicationId'],
-                              orElse: () => <String, dynamic>{},
-                            );
-                            final subtitlePrefix = app.isNotEmpty
-                                ? '${app['companyName']} (${app['jobTitle']}) • '
-                                : '';
-  
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12.0),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: statusColor.withOpacity(0.1),
-                                  child: Icon(Icons.notifications_active_outlined, color: statusColor, size: 20),
-                                ),
-                                title: Text(
-                                  alert['message'] ?? 'Follow up reminder',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('$subtitlePrefix$daysText'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '${date.month}/${date.day}',
-                                      style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                                      onPressed: () => _deleteAlert(alert['alertId']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40.0),
+                  child: Center(
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                )
+              : _filteredAlerts.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 60.0),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.notifications_off_outlined,
+                          size: 56,
+                          color: Colors.grey[400],
                         ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No reminders in this folder.',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 12.0,
+                  ),
+                  itemCount: _filteredAlerts.length,
+                  itemBuilder: (context, index) {
+                    final alert = _filteredAlerts[index];
+                    final date =
+                        DateTime.tryParse(alert['alertDate'] ?? '') ??
+                        DateTime.now();
+                    final now = DateTime.now();
+                    final difference = date.difference(now).inDays;
+
+                    String daysText;
+                    Color statusColor;
+                    if (alert['isSent'] == true) {
+                      daysText = 'Completed / Sent';
+                      statusColor = Colors.grey;
+                    } else if (difference < 0) {
+                      daysText = 'Overdue by ${difference.abs()} days';
+                      statusColor = Colors.redAccent;
+                    } else if (difference == 0) {
+                      daysText = 'Due Today';
+                      statusColor = Colors.orange;
+                    } else {
+                      daysText = 'In $difference days';
+                      statusColor = Colors.green;
+                    }
+
+                    // Match linked application
+                    final app = _applications.firstWhere(
+                      (a) => a['applicationId'] == alert['applicationId'],
+                      orElse: () => <String, dynamic>{},
+                    );
+                    final subtitlePrefix = app.isNotEmpty
+                        ? '${app['companyName']} (${app['jobTitle']}) • '
+                        : '';
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: statusColor.withValues(alpha: 0.1),
+                          child: Icon(
+                            Icons.notifications_active_outlined,
+                            color: statusColor,
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          alert['message'] ?? 'Follow up reminder',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text('$subtitlePrefix$daysText'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${date.month}/${date.day}',
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () => _deleteAlert(alert['alertId']),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );

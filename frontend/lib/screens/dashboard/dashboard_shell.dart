@@ -6,20 +6,40 @@ import 'alerts_view.dart';
 import 'documents_view.dart';
 
 class DashboardShell extends StatefulWidget {
-  const DashboardShell({super.key});
+  final int currentIndex;
+  const DashboardShell({super.key, required this.currentIndex});
 
   @override
   State<DashboardShell> createState() => _DashboardShellState();
 }
 
 class _DashboardShellState extends State<DashboardShell> {
-  int _currentIndex = 0;
   Map<String, dynamic>? _user;
 
   void _navigateToTab(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (index == widget.currentIndex) return;
+    String targetRoute;
+    switch (index) {
+      case 0:
+        targetRoute = AppRoutes.dashboard;
+        break;
+      case 1:
+        targetRoute = AppRoutes.applications;
+        break;
+      case 2:
+        targetRoute = AppRoutes.alerts;
+        break;
+      case 3:
+        targetRoute = AppRoutes.documents;
+        break;
+      default:
+        targetRoute = AppRoutes.dashboard;
+    }
+    Navigator.pushReplacementNamed(
+      context,
+      targetRoute,
+      arguments: _user,
+    );
   }
 
   @override
@@ -36,7 +56,7 @@ class _DashboardShellState extends State<DashboardShell> {
     final user = _user!;
 
     Widget currentPage;
-    switch (_currentIndex) {
+    switch (widget.currentIndex) {
       case 0:
         currentPage = DashboardView(
           key: const ValueKey('dashboard'),
@@ -106,12 +126,8 @@ class _DashboardShellState extends State<DashboardShell> {
         child: currentPage,
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        selectedIndex: widget.currentIndex,
+        onDestinationSelected: _navigateToTab,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
