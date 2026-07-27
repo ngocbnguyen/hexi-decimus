@@ -322,7 +322,7 @@ class _DashboardViewState extends State<DashboardView> {
                     alignment: Alignment.center,
                     children: [
                       CircularProgressIndicator(
-                        value: total == 0 ? 0 : (inProgress + interview + offer) / total,
+                        value: total == 0 ? 0.0 : (inProgress + interview + offer) / total,
                         strokeWidth: 16,
                         backgroundColor: Colors.grey[200],
                         valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
