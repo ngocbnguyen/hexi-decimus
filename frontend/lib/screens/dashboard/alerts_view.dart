@@ -285,9 +285,8 @@ class _AlertsViewState extends State<AlertsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
           // Title banner & Quick action
           Padding(
@@ -313,7 +312,7 @@ class _AlertsViewState extends State<AlertsView> {
               ],
             ),
           ),
-
+  
           // Filter tabs
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -330,13 +329,13 @@ class _AlertsViewState extends State<AlertsView> {
                   final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
                   final isSent = alert['isSent'] ?? false;
                   final difference = date.difference(DateTime.now()).inDays;
-
+  
                   if (tabName == 'Completed') return isSent;
                   if (tabName == 'Due Today') return !isSent && difference == 0;
                   if (tabName == 'Overdue') return !isSent && difference < 0;
                   return !isSent && difference > 0;
                 }).length;
-
+  
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: ChoiceChip(
@@ -348,15 +347,22 @@ class _AlertsViewState extends State<AlertsView> {
               }).toList(),
             ),
           ),
-
+  
           // Alerts List
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage.isNotEmpty
-                    ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
-                    : _filteredAlerts.isEmpty
-                        ? Center(
+          _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40.0),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : _errorMessage.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40.0),
+                      child: Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red))),
+                    )
+                  : _filteredAlerts.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 60.0),
+                          child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -365,73 +371,75 @@ class _AlertsViewState extends State<AlertsView> {
                                 Text('No reminders in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
                               ],
                             ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                            itemCount: _filteredAlerts.length,
-                            itemBuilder: (context, index) {
-                              final alert = _filteredAlerts[index];
-                              final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
-                              final now = DateTime.now();
-                              final difference = date.difference(now).inDays;
-
-                              String daysText;
-                              Color statusColor;
-                              if (alert['isSent'] == true) {
-                                daysText = 'Completed / Sent';
-                                statusColor = Colors.grey;
-                              } else if (difference < 0) {
-                                daysText = 'Overdue by ${difference.abs()} days';
-                                statusColor = Colors.redAccent;
-                              } else if (difference == 0) {
-                                daysText = 'Due Today';
-                                statusColor = Colors.orange;
-                              } else {
-                                daysText = 'In $difference days';
-                                statusColor = Colors.green;
-                              }
-
-                              // Match linked application
-                              final app = _applications.firstWhere(
-                                (a) => a['applicationId'] == alert['applicationId'],
-                                orElse: () => <String, dynamic>{},
-                              );
-                              final subtitlePrefix = app.isNotEmpty
-                                  ? '${app['companyName']} (${app['jobTitle']}) • '
-                                  : '';
-
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12.0),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: statusColor.withOpacity(0.1),
-                                    child: Icon(Icons.notifications_active_outlined, color: statusColor, size: 20),
-                                  ),
-                                  title: Text(
-                                    alert['message'] ?? 'Follow up reminder',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text('$subtitlePrefix$daysText'),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        '${date.month}/${date.day}',
-                                        style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                                        onPressed: () => _deleteAlert(alert['alertId']),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
                           ),
-          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                          itemCount: _filteredAlerts.length,
+                          itemBuilder: (context, index) {
+                            final alert = _filteredAlerts[index];
+                            final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
+                            final now = DateTime.now();
+                            final difference = date.difference(now).inDays;
+  
+                            String daysText;
+                            Color statusColor;
+                            if (alert['isSent'] == true) {
+                              daysText = 'Completed / Sent';
+                              statusColor = Colors.grey;
+                            } else if (difference < 0) {
+                              daysText = 'Overdue by ${difference.abs()} days';
+                              statusColor = Colors.redAccent;
+                            } else if (difference == 0) {
+                              daysText = 'Due Today';
+                              statusColor = Colors.orange;
+                            } else {
+                              daysText = 'In $difference days';
+                              statusColor = Colors.green;
+                            }
+  
+                            // Match linked application
+                            final app = _applications.firstWhere(
+                              (a) => a['applicationId'] == alert['applicationId'],
+                              orElse: () => <String, dynamic>{},
+                            );
+                            final subtitlePrefix = app.isNotEmpty
+                                ? '${app['companyName']} (${app['jobTitle']}) • '
+                                : '';
+  
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 12.0),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: statusColor.withOpacity(0.1),
+                                  child: Icon(Icons.notifications_active_outlined, color: statusColor, size: 20),
+                                ),
+                                title: Text(
+                                  alert['message'] ?? 'Follow up reminder',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('$subtitlePrefix$daysText'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '${date.month}/${date.day}',
+                                      style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                                      onPressed: () => _deleteAlert(alert['alertId']),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
         ],
       ),
     );

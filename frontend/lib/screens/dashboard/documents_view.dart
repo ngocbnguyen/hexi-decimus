@@ -286,9 +286,8 @@ class _DocumentsViewState extends State<DocumentsView> {
     final transcriptCount = _allDocuments.where((d) => d['documentType'] == 'Transcript').length;
     final certificateCount = _allDocuments.where((d) => d['documentType'] == 'Certificate').length;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
           // Action Header
           Padding(
@@ -347,13 +346,20 @@ class _DocumentsViewState extends State<DocumentsView> {
           ),
   
           // List of Documents in active folder
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage.isNotEmpty
-                    ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
-                    : _filteredDocuments.isEmpty
-                        ? Center(
+          _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40.0),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : _errorMessage.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40.0),
+                      child: Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red))),
+                    )
+                  : _filteredDocuments.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 60.0),
+                          child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -362,47 +368,49 @@ class _DocumentsViewState extends State<DocumentsView> {
                                 Text('No documents in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
                               ],
                             ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                            itemCount: _filteredDocuments.length,
-                            itemBuilder: (context, index) {
-                              final doc = _filteredDocuments[index];
-                              final date = DateTime.tryParse(doc['uploadedAt'] ?? '') ?? DateTime.now();
-                              final dateStr = '${date.month}/${date.day}/${date.year}';
-  
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12.0),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                elevation: 1,
-                                child: ListTile(
-                                  leading: const CircleAvatar(
-                                    backgroundColor: Colors.redAccent,
-                                    child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
-                                  ),
-                                  title: Text(
-                                    doc['fileName'] ?? '',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text('Uploaded: $dateStr'),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.download, color: Colors.blueAccent),
-                                        onPressed: () => _downloadDocument(doc['documentId']),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                                        onPressed: () => _deleteDocument(doc['documentId']),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
                           ),
-          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                          itemCount: _filteredDocuments.length,
+                          itemBuilder: (context, index) {
+                            final doc = _filteredDocuments[index];
+                            final date = DateTime.tryParse(doc['uploadedAt'] ?? '') ?? DateTime.now();
+                            final dateStr = '${date.month}/${date.day}/${date.year}';
+  
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 12.0),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 1,
+                              child: ListTile(
+                                leading: const CircleAvatar(
+                                  backgroundColor: Colors.redAccent,
+                                  child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
+                                ),
+                                title: Text(
+                                  doc['fileName'] ?? '',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('Uploaded: $dateStr'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.download, color: Colors.blueAccent),
+                                      onPressed: () => _downloadDocument(doc['documentId']),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                                      onPressed: () => _deleteDocument(doc['documentId']),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
         ],
       ),
     );

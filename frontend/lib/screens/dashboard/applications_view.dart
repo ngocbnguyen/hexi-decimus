@@ -322,9 +322,8 @@ class _ApplicationsViewState extends State<ApplicationsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
           // Action Bar (Search & Add button)
           Padding(
@@ -353,7 +352,7 @@ class _ApplicationsViewState extends State<ApplicationsView> {
               ],
             ),
           ),
-
+  
           // Horizontal filter tags
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -371,7 +370,7 @@ class _ApplicationsViewState extends State<ApplicationsView> {
                     ? _allApplications.length
                     : _allApplications.where((a) => a['status'] == filter).length;
                 final isSelected = _selectedFilter == filter;
-
+  
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: ChoiceChip(
@@ -383,15 +382,22 @@ class _ApplicationsViewState extends State<ApplicationsView> {
               }).toList(),
             ),
           ),
-
+  
           // Applications List
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage.isNotEmpty
-                    ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
-                    : _filteredApplications.isEmpty
-                        ? Center(
+          _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40.0),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : _errorMessage.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40.0),
+                      child: Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red))),
+                    )
+                  : _filteredApplications.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 60.0),
+                          child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -400,51 +406,53 @@ class _ApplicationsViewState extends State<ApplicationsView> {
                                 Text('No applications found.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
                               ],
                             ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                            itemCount: _filteredApplications.length,
-                            itemBuilder: (context, index) {
-                              final app = _filteredApplications[index];
-                              final date = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
-                              final dateStr = '${date.month}/${date.day}/${date.year}';
-
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12.0),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                elevation: 1,
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                    child: Text(
-                                      (app['companyName'] ?? 'C')[0].toUpperCase(),
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.primary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                          itemCount: _filteredApplications.length,
+                          itemBuilder: (context, index) {
+                            final app = _filteredApplications[index];
+                            final date = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
+                            final dateStr = '${date.month}/${date.day}/${date.year}';
+  
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 12.0),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 1,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                  child: Text(
+                                    (app['companyName'] ?? 'C')[0].toUpperCase(),
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  title: Text(
-                                    app['companyName'] ?? '',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text('${app['jobTitle'] ?? ''} • Applied $dateStr'),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      _buildStatusTag(app['status'] ?? 'In Progress'),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                        onPressed: () => _deleteApplication(app['applicationId']),
-                                      ),
-                                    ],
-                                  ),
                                 ),
-                              );
-                            },
-                          ),
-          ),
+                                title: Text(
+                                  app['companyName'] ?? '',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('${app['jobTitle'] ?? ''} • Applied $dateStr'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _buildStatusTag(app['status'] ?? 'In Progress'),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                      onPressed: () => _deleteApplication(app['applicationId']),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
         ],
       ),
     );
