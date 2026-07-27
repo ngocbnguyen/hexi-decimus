@@ -73,4 +73,24 @@ class JobService {
       throw Exception('Connection failed. Please verify that the backend server is running.');
     }
   }
+
+  /// Updates an existing job application.
+  static Future<Map<String, dynamic>> updateApplication(int applicationId, Map<String, dynamic> data) async {
+    final url = Uri.parse('$_baseUrl/$applicationId');
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Failed to update application: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Connection failed. Please verify that the backend server is running.');
+    }
+  }
 }

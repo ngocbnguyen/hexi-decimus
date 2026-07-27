@@ -293,6 +293,209 @@ class _ApplicationsViewState extends State<ApplicationsView> {
     }
   }
 
+  void _showEditApplicationSheet(Map<String, dynamic> app) {
+    // Populate Form Fields
+    _companyController.text = app['companyName'] ?? '';
+    _titleController.text = app['jobTitle'] ?? '';
+    _portalController.text = app['portalLink'] ?? '';
+    _contactNameController.text = app['contactName'] ?? '';
+    _contactEmailController.text = app['contactEmail'] ?? '';
+    _notesController.text = app['notes'] ?? '';
+    _selectedStatus = app['status'] ?? 'In Progress';
+    _selectedDate = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 24,
+                right: 24,
+                top: 24,
+              ),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Edit Job Status & Details',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _companyController,
+                        decoration: const InputDecoration(
+                          labelText: 'Company Name *',
+                          prefixIcon: Icon(Icons.business),
+                        ),
+                        validator: (value) => value == null || value.isEmpty ? 'Company is required' : null,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Job Title *',
+                          prefixIcon: Icon(Icons.work_outline),
+                        ),
+                        validator: (value) => value == null || value.isEmpty ? 'Job title is required' : null,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedStatus,
+                        decoration: const InputDecoration(
+                          labelText: 'Application Status',
+                          prefixIcon: Icon(Icons.info_outline),
+                        ),
+                        items: ['In Progress', 'Interview', 'Offer', 'Rejected', 'Withdrawn']
+                            .map((status) => DropdownMenuItem(value: status, child: Text(status)))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setModalState(() {
+                              _selectedStatus = value;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // Date Picker Row
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today, color: Colors.grey),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Applied On: ${_selectedDate.month}/${_selectedDate.day}/${_selectedDate.year}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: _selectedDate,
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2100),
+                              );
+                              if (picked != null) {
+                                setModalState(() {
+                                  _selectedDate = picked;
+                                });
+                              }
+                            },
+                            child: const Text('Change'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _portalController,
+                        decoration: const InputDecoration(
+                          labelText: 'Portal Link',
+                          prefixIcon: Icon(Icons.link),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _contactNameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Contact Name',
+                          prefixIcon: Icon(Icons.person_outline),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _contactEmailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Contact Email',
+                          prefixIcon: Icon(Icons.email_outlined),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _notesController,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          labelText: 'Notes',
+                          prefixIcon: Icon(Icons.note_alt_outlined),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => _submitEdit(app['applicationId']),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(0, 48),
+                            ),
+                            child: const Text('Save Changes'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _submitEdit(int applicationId) async {
+    if (_formKey.currentState!.validate()) {
+      Navigator.pop(context); // Close bottom sheet
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final userId = widget.user['userId'] ?? 1;
+        final appData = {
+          'applicationId': applicationId,
+          'userId': userId,
+          'companyName': _companyController.text.trim(),
+          'jobTitle': _titleController.text.trim(),
+          'portalLink': _portalController.text.trim(),
+          'contactName': _contactNameController.text.trim(),
+          'contactEmail': _contactEmailController.text.trim(),
+          'status': _selectedStatus,
+          'notes': _notesController.text.trim(),
+          'applicationDate': _selectedDate.toIso8601String(),
+        };
+
+        await JobService.updateApplication(applicationId, appData);
+        _loadApplications();
+      } catch (e) {
+        setState(() {
+          _errorMessage = e.toString().replaceAll('Exception: ', '');
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _deleteApplication(int id) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -427,6 +630,7 @@ class _ApplicationsViewState extends State<ApplicationsView> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 1,
                       child: ListTile(
+                        onTap: () => _showEditApplicationSheet(app),
                         leading: CircleAvatar(
                           backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                           child: Text(
