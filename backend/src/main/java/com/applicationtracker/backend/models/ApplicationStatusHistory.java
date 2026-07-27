@@ -13,7 +13,7 @@ public class ApplicationStatusHistory {
     private Long historyId;
 
     @Column(name = "application_id", nullable = false)
-    private Long applicationId;
+    private Integer applicationId;
 
     @Column(name = "old_status", length = 45)
     private String oldStatus;
@@ -26,7 +26,7 @@ public class ApplicationStatusHistory {
 
     public ApplicationStatusHistory() {}
 
-    public ApplicationStatusHistory(Long applicationId, String oldStatus, String newStatus, LocalDateTime changedAt) {
+    public ApplicationStatusHistory(Integer applicationId, String oldStatus, String newStatus, LocalDateTime changedAt) {
         this.applicationId = applicationId;
         this.oldStatus = oldStatus;
         this.newStatus = newStatus;
@@ -37,11 +37,11 @@ public class ApplicationStatusHistory {
         return historyId;
     }
 
-    public Long getApplicationId() {
+    public Integer getApplicationId() {
         return applicationId;
     }
 
-    public void setApplicationId(Long applicationId) {
+    public void setApplicationId(Integer applicationId) {
         this.applicationId = applicationId;
     }
 

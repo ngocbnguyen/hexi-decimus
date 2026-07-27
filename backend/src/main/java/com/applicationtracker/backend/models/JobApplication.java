@@ -9,7 +9,7 @@ public class JobApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long applicationId;
+    private Integer applicationId;
 
     @Column(nullable = false, length = 45)
     private String companyName;
@@ -35,14 +35,14 @@ public class JobApplication {
     private String notes;
 
     @Column(nullable = false)
-    private Long userId; // FK to users table
+    private Integer userId; // FK to users table
 
     // Constructors
     public JobApplication() {}
 
-    public JobApplication(Long applicationId, String companyName, String jobTitle, String portalLink, 
+    public JobApplication(Integer applicationId, String companyName, String jobTitle, String portalLink, 
                           String contactName, String contactEmail, LocalDateTime applicationDate, 
-                          String status, String notes, Long userId) {
+                          String status, String notes, Integer userId) {
         this.applicationId = applicationId;
         this.companyName = companyName;
         this.jobTitle = jobTitle;
@@ -56,11 +56,11 @@ public class JobApplication {
     }
 
     // Getters and Setters
-    public Long getApplicationId() {
+    public Integer getApplicationId() {
         return applicationId;
     }
 
-    public void setApplicationId(Long applicationId) {
+    public void setApplicationId(Integer applicationId) {
         this.applicationId = applicationId;
     }
 
@@ -128,11 +128,11 @@ public class JobApplication {
         this.notes = notes;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -142,7 +142,7 @@ public class JobApplication {
     }
 
     public static class JobApplicationBuilder {
-        private Long applicationId;
+        private Integer applicationId;
         private String companyName;
         private String jobTitle;
         private String portalLink;
@@ -151,9 +151,9 @@ public class JobApplication {
         private LocalDateTime applicationDate;
         private String status;
         private String notes;
-        private Long userId;
+        private Integer userId;
 
-        public JobApplicationBuilder applicationId(Long applicationId) {
+        public JobApplicationBuilder applicationId(Integer applicationId) {
             this.applicationId = applicationId;
             return this;
         }
@@ -198,14 +198,14 @@ public class JobApplication {
             return this;
         }
 
-        public JobApplicationBuilder userId(Long userId) {
+        public JobApplicationBuilder userId(Integer userId) {
             this.userId = userId;
             return this;
         }
 
         public JobApplication build() {
             return new JobApplication(applicationId, companyName, jobTitle, portalLink, contactName, 
-                                      contactEmail, applicationDate, status, notes, userId);
+                                       contactEmail, applicationDate, status, notes, userId);
         }
     }
 }
