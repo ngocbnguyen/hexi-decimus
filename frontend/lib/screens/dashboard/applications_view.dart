@@ -242,6 +242,9 @@ class _ApplicationsViewState extends State<ApplicationsView> {
                           const SizedBox(width: 8),
                           ElevatedButton(
                             onPressed: _submitApplication,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(0, 48),
+                            ),
                             child: const Text('Save Application'),
                           ),
                         ],

@@ -195,6 +195,9 @@ class _DocumentsViewState extends State<DocumentsView> {
                 ),
                 ElevatedButton(
                   onPressed: _mockFileName.isNotEmpty ? _submitUpload : null,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
+                  ),
                   child: const Text('Upload'),
                 ),
               ],

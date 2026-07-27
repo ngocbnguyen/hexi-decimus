@@ -232,6 +232,9 @@ class _AlertsViewState extends State<AlertsView> {
                 ),
                 ElevatedButton(
                   onPressed: _submitAlert,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
+                  ),
                   child: const Text('Schedule'),
                 ),
               ],
