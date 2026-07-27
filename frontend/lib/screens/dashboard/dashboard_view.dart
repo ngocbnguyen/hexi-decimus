@@ -279,7 +279,7 @@ class _DashboardViewState extends State<DashboardView> {
               ),
             ),
             GestureDetector(
-              onTap: () => widget.onNavigateToTab(0),
+              onTap: () => widget.onNavigateToTab(1),
               child: Text(
                 'View all',
                 style: TextStyle(
@@ -498,7 +498,7 @@ class _DashboardViewState extends State<DashboardView> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
-                  onPressed: () => widget.onNavigateToTab(0),
+                  onPressed: () => widget.onNavigateToTab(1),
                   child: const Text('View all applications'),
                 ),
               ],
