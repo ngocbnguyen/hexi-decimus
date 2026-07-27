@@ -376,41 +376,41 @@ class _DocumentsViewState extends State<DocumentsView> {
                           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
                           itemCount: _filteredDocuments.length,
                           itemBuilder: (context, index) {
-                            final doc = _filteredDocuments[index];
-                            final date = DateTime.tryParse(doc['uploadedAt'] ?? '') ?? DateTime.now();
-                            final dateStr = '${date.month}/${date.day}/${date.year}';
-  
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12.0),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 1,
-                              child: ListTile(
-                                leading: const CircleAvatar(
-                                  backgroundColor: Colors.redAccent,
-                                  child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
-                                ),
-                                title: Text(
-                                  doc['fileName'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('Uploaded: $dateStr'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.download, color: Colors.blueAccent),
-                                      onPressed: () => _downloadDocument(doc['documentId']),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                                      onPressed: () => _deleteDocument(doc['documentId']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                    final doc = _filteredDocuments[index];
+                    final date = DateTime.tryParse(doc['uploadedAt'] ?? '') ?? DateTime.now();
+                    final dateStr = '${date.month}/${date.day}/${date.year}';
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12.0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 1,
+                      child: ListTile(
+                        leading: const CircleAvatar(
+                          backgroundColor: Colors.redAccent,
+                          child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
                         ),
+                        title: Text(
+                          doc['fileName'] ?? '',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text('Uploaded: $dateStr'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.download, color: Colors.blueAccent),
+                              onPressed: () => _downloadDocument(doc['documentId']),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                              onPressed: () => _deleteDocument(doc['documentId']),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );

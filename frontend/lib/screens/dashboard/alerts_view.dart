@@ -308,50 +308,45 @@ class _AlertsViewState extends State<AlertsView> {
                 Text(
                   'Follow Up Alerts',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                 ),
                 ElevatedButton.icon(
                   onPressed: _showAddAlertSheet,
                   icon: const Icon(Icons.alarm_add, size: 20),
                   label: const Text('Add Alert'),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   ),
                 ),
               ],
             ),
           ),
-
+  
           // Filter tabs
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
-              children: ['Upcoming', 'Due Today', 'Overdue', 'Completed'].map((
-                tabName,
-              ) {
+              children: [
+                'Upcoming',
+                'Due Today',
+                'Overdue',
+                'Completed',
+              ].map((tabName) {
                 final isSelected = _selectedTab == tabName;
                 final count = _allAlerts.where((alert) {
-                  final date =
-                      DateTime.tryParse(alert['alertDate'] ?? '') ??
-                      DateTime.now();
+                  final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
                   final isSent = alert['isSent'] ?? false;
                   final difference = date.difference(DateTime.now()).inDays;
-
+  
                   if (tabName == 'Completed') return isSent;
                   if (tabName == 'Due Today') return !isSent && difference == 0;
                   if (tabName == 'Overdue') return !isSent && difference < 0;
                   return !isSent && difference > 0;
                 }).length;
-
+  
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: ChoiceChip(
@@ -363,7 +358,7 @@ class _AlertsViewState extends State<AlertsView> {
               }).toList(),
             ),
           ),
-
+  
           // Alerts List
           _isLoading
               ? const Padding(
@@ -371,52 +366,32 @@ class _AlertsViewState extends State<AlertsView> {
                   child: Center(child: CircularProgressIndicator()),
                 )
               : _errorMessage.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40.0),
-                  child: Center(
-                    child: Text(
-                      _errorMessage,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-                )
-              : _filteredAlerts.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 60.0),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_off_outlined,
-                          size: 56,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No reminders in this folder.',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40.0),
+                      child: Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red))),
+                    )
+                  : _filteredAlerts.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 60.0),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text('No reminders in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 12.0,
-                  ),
-                  itemCount: _filteredAlerts.length,
-                  itemBuilder: (context, index) {
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                          itemCount: _filteredAlerts.length,
+                          itemBuilder: (context, index) {
                     final alert = _filteredAlerts[index];
-                    final date =
-                        DateTime.tryParse(alert['alertDate'] ?? '') ??
-                        DateTime.now();
+                    final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
                     final now = DateTime.now();
                     final difference = date.difference(now).inDays;
 
@@ -447,17 +422,11 @@ class _AlertsViewState extends State<AlertsView> {
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: statusColor.withValues(alpha: 0.1),
-                          child: Icon(
-                            Icons.notifications_active_outlined,
-                            color: statusColor,
-                            size: 20,
-                          ),
+                          backgroundColor: statusColor.withOpacity(0.1),
+                          child: Icon(Icons.notifications_active_outlined, color: statusColor, size: 20),
                         ),
                         title: Text(
                           alert['message'] ?? 'Follow up reminder',
@@ -469,17 +438,11 @@ class _AlertsViewState extends State<AlertsView> {
                           children: [
                             Text(
                               '${date.month}/${date.day}',
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(width: 8),
                             IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.grey,
-                              ),
+                              icon: const Icon(Icons.delete_outline, color: Colors.grey),
                               onPressed: () => _deleteAlert(alert['alertId']),
                             ),
                           ],

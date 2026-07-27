@@ -414,45 +414,45 @@ class _ApplicationsViewState extends State<ApplicationsView> {
                           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                           itemCount: _filteredApplications.length,
                           itemBuilder: (context, index) {
-                            final app = _filteredApplications[index];
-                            final date = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
-                            final dateStr = '${date.month}/${date.day}/${date.year}';
-  
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12.0),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 1,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                  child: Text(
-                                    (app['companyName'] ?? 'C')[0].toUpperCase(),
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                title: Text(
-                                  app['companyName'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('${app['jobTitle'] ?? ''} • Applied $dateStr'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _buildStatusTag(app['status'] ?? 'In Progress'),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                      onPressed: () => _deleteApplication(app['applicationId']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                    final app = _filteredApplications[index];
+                    final date = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
+                    final dateStr = '${date.month}/${date.day}/${date.year}';
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12.0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 1,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          child: Text(
+                            (app['companyName'] ?? 'C')[0].toUpperCase(),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
+                        title: Text(
+                          app['companyName'] ?? '',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text('${app['jobTitle'] ?? ''} • Applied $dateStr'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildStatusTag(app['status'] ?? 'In Progress'),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                              onPressed: () => _deleteApplication(app['applicationId']),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );
