@@ -67,12 +67,9 @@ class _DashboardShellState extends State<DashboardShell> {
           ),
         ],
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: KeyedSubtree(
-          key: ValueKey(_currentIndex),
-          child: pages[_currentIndex],
-        ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: pages,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
