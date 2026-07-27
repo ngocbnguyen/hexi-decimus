@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../config/routes.dart';
+import 'dashboard_view.dart';
+import 'applications_view.dart';
+import 'alerts_view.dart';
+import 'documents_view.dart';
 
 class DashboardShell extends StatefulWidget {
   const DashboardShell({super.key});
@@ -11,50 +15,49 @@ class DashboardShell extends StatefulWidget {
 class _DashboardShellState extends State<DashboardShell> {
   int _currentIndex = 0;
 
-  static const _tabs = [
-    _TabInfo(
-      icon: Icons.assignment_outlined,
-      selectedIcon: Icons.assignment,
-      label: 'Jobs',
-      title: 'AppTracker',
-      emptyStateIcon: Icons.assignment_outlined,
-      emptyStateText: 'Your job applications will show up here',
-    ),
-    _TabInfo(
-      icon: Icons.folder_open_outlined,
-      selectedIcon: Icons.folder,
-      label: 'Files',
-      title: 'Documents',
-      emptyStateIcon: Icons.folder_open_outlined,
-      emptyStateText: 'Resumes and cover letters will show up here',
-    ),
-    _TabInfo(
-      icon: Icons.notifications_none_outlined,
-      selectedIcon: Icons.notifications,
-      label: 'Alerts',
-      title: 'Reminders',
-      emptyStateIcon: Icons.notifications_none_outlined,
-      emptyStateText: 'Upcoming reminders and alerts will show up here',
-    ),
-    _TabInfo(
-      icon: Icons.person_outline,
-      selectedIcon: Icons.person,
-      label: 'Profile',
-      title: 'Profile & Settings',
-      emptyStateIcon: Icons.person_outline,
-      emptyStateText: 'Your profile and settings will show up here',
-    ),
-  ];
+  void _navigateToTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final currentTab = _tabs[_currentIndex];
+    // Extract user details passed as route arguments from login/register screens
+    final Map<String, dynamic> user = (ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?) 
+        ?? {'userId': 1, 'name': 'Ngoc', 'email': 'student@gsu.edu'};
+
+    // Navigation pages mapping to tabs
+    final List<Widget> pages = [
+      DashboardView(user: user, onNavigateToTab: _navigateToTab),
+      ApplicationsView(user: user),
+      AlertsView(user: user),
+      DocumentsView(user: user),
+    ];
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text(currentTab.title),
+        title: Row(
+          children: [
+            Icon(Icons.track_changes, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 8),
+            const Text(
+              'AppTracker',
+              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            ),
+          ],
+        ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Center(
+              child: Text(
+                'User: ${user['name']}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Log out',
@@ -65,13 +68,10 @@ class _DashboardShellState extends State<DashboardShell> {
         ],
       ),
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 250),
         child: KeyedSubtree(
           key: ValueKey(_currentIndex),
-          child: _EmptyStateView(
-            icon: currentTab.emptyStateIcon,
-            text: currentTab.emptyStateText,
-          ),
+          child: pages[_currentIndex],
         ),
       ),
       bottomNavigationBar: NavigationBar(
@@ -81,74 +81,28 @@ class _DashboardShellState extends State<DashboardShell> {
             _currentIndex = index;
           });
         },
-        destinations: [
-          for (final tab in _tabs)
-            NavigationDestination(
-              icon: Icon(tab.icon),
-              selectedIcon: Icon(tab.selectedIcon),
-              label: tab.label,
-            ),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.assignment_outlined),
+            selectedIcon: Icon(Icons.assignment),
+            label: 'Applications',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.notifications_none_outlined),
+            selectedIcon: Icon(Icons.notifications),
+            label: 'Alerts',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.folder_open_outlined),
+            selectedIcon: Icon(Icons.folder),
+            label: 'Documents',
+          ),
         ],
-      ),
-      floatingActionButton: _currentIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Add application sheet coming soon!')),
-                );
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
-    );
-  }
-}
-
-class _TabInfo {
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final String title;
-  final IconData emptyStateIcon;
-  final String emptyStateText;
-
-  const _TabInfo({
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.title,
-    required this.emptyStateIcon,
-    required this.emptyStateText,
-  });
-}
-
-/// Shared placeholder look for tabs with no content yet, so the shell
-/// doesn't show bare, inconsistently styled Text widgets per tab.
-class _EmptyStateView extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _EmptyStateView({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 56, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
-            ),
-          ],
-        ),
       ),
     );
   }

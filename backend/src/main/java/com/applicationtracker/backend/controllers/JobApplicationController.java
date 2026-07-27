@@ -21,6 +21,7 @@ public class JobApplicationController {
 
     @GetMapping
     public ResponseEntity<List<JobApplication>> getAll(
+            @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName,
             @RequestParam(required = false) String jobTitle,
@@ -28,7 +29,7 @@ public class JobApplicationController {
             @RequestParam(required = false) String order
     ) {
         return ResponseEntity.ok(
-            service.getFilteredAndSorted(status, companyName, jobTitle, sort, order)
+            service.getFilteredAndSorted(userId, status, companyName, jobTitle, sort, order)
         );
     }
 

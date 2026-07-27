@@ -30,7 +30,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         if (mounted) {
-          Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+          Navigator.pushReplacementNamed(
+            context, 
+            AppRoutes.dashboard,
+            arguments: userData,
+          );
         }
       } catch (e) {
         if (mounted) {

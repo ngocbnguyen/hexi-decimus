@@ -25,4 +25,10 @@ public class JobApplicationSpecs {
                         "%" + jobTitle.toLowerCase() + "%"
                 );
     }
+
+    public static Specification<JobApplication> hasUserId(Integer userId) {
+        return (root, query, builder) ->
+                userId == null ? null : builder.equal(root.get("userId"), userId);
+    }
 }
+

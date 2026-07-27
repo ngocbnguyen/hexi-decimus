@@ -25,6 +25,7 @@ public class JobApplicationService {
     }
 
     public List<JobApplication> getFilteredAndSorted(
+            Integer userId,
             String status,
             String companyName,
             String jobTitle,
@@ -32,8 +33,9 @@ public class JobApplicationService {
             String sortOrder
     ) {
         Specification<JobApplication> spec = Specification.where(
-                JobApplicationSpecs.hasStatus(status)
-        ).and(JobApplicationSpecs.hasCompanyName(companyName))
+                JobApplicationSpecs.hasUserId(userId)
+        ).and(JobApplicationSpecs.hasStatus(status))
+         .and(JobApplicationSpecs.hasCompanyName(companyName))
          .and(JobApplicationSpecs.hasJobTitle(jobTitle));
 
         Sort sort = Sort.unsorted();

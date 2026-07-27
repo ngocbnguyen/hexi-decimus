@@ -30,7 +30,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (mounted) {
           // Success: Navigate to the Dashboard
-          Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+          Navigator.pushReplacementNamed(
+            context, 
+            AppRoutes.dashboard,
+            arguments: userData,
+          );
         }
       } catch (e) {
         if (mounted) {
