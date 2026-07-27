@@ -49,7 +49,7 @@ public class JobApplicationService {
         return repository.findAll(spec, sort);
     }
 
-    public List<ApplicationStatusHistory> getHistory(Long applicationId) {
+    public List<ApplicationStatusHistory> getHistory(Integer applicationId) {
         return historyRepository.findByApplicationIdOrderByChangedAtDesc(applicationId);
     }
 
@@ -57,7 +57,7 @@ public class JobApplicationService {
         return repository.findAll();
     }
 
-    public JobApplication getById(Long id) {
+    public JobApplication getById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
     }
@@ -66,7 +66,7 @@ public class JobApplicationService {
         return repository.save(application);
     }
 
-    public JobApplication update(Long id, JobApplication updated) {
+    public JobApplication update(Integer id, JobApplication updated) {
         JobApplication existing = getById(id);
 
         if (updated.getStatus() != null &&
@@ -95,7 +95,7 @@ public class JobApplicationService {
         return repository.save(existing);
     }
 
-    public void delete(Long id) {
+    public void delete(Integer id) {
         repository.deleteById(id);
     }
 }

@@ -32,7 +32,7 @@ class JobApplicationTests {
         testApplication.setApplicationDate(LocalDateTime.now());
         testApplication.setStatus("In Progress");
         testApplication.setNotes("First round technical interview scheduled");
-        testApplication.setUserId(1L);
+        testApplication.setUserId(1);
     }
 
     @AfterEach
@@ -64,7 +64,7 @@ class JobApplicationTests {
         Assertions.assertEquals("Google", savedApplication.getCompanyName(), "Company name should match input");
         Assertions.assertEquals("Software Engineer Intern", savedApplication.getJobTitle(), "Job title should match input");
         Assertions.assertEquals("In Progress", savedApplication.getStatus(), "Status should match input");
-        Assertions.assertEquals(1L, savedApplication.getUserId(), "User ID should match input");
+        Assertions.assertEquals(1, savedApplication.getUserId(), "User ID should match input");
 
         System.out.println("✅ TEST PASSED: Job Application created successfully!");
         System.out.println("   Assigned Application ID: " + savedApplication.getApplicationId());

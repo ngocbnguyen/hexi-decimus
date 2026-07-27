@@ -9,10 +9,10 @@ import java.util.List;
 
 @Repository
 public interface JobApplicationRepository  
-        extends JpaRepository<JobApplication, Long>,
+        extends JpaRepository<JobApplication, Integer>,
                 JpaSpecificationExecutor<JobApplication> {
 
-    List<JobApplication> findByUserId(Long userId);
+    List<JobApplication> findByUserId(Integer userId);
 
     List<JobApplication> findByStatus(String status);
 

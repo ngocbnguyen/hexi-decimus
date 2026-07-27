@@ -34,7 +34,7 @@ public class JobApplicationController {
     }
 
     @GetMapping("/{id}/history")
-    public ResponseEntity<List<ApplicationStatusHistory>> getHistory(@PathVariable Long id) {
+    public ResponseEntity<List<ApplicationStatusHistory>> getHistory(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getHistory(id));
     }
 
@@ -44,13 +44,13 @@ public class JobApplicationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<JobApplication> update(@PathVariable Long id,
+    public ResponseEntity<JobApplication> update(@PathVariable Integer id,
                                                  @RequestBody JobApplication updated) {
         return ResponseEntity.ok(service.update(id, updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.ok("Application deleted");
     }
