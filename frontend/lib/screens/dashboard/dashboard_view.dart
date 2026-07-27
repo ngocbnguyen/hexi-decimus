@@ -20,6 +20,8 @@ class _DashboardViewState extends State<DashboardView> {
   bool _isLoading = true;
   List<Map<String, dynamic>> _applications = [];
   List<Map<String, dynamic>> _alerts = [];
+  List<Map<String, dynamic>> _topAlerts = [];
+  List<Map<String, dynamic>> _recentApps = [];
   String _errorMessage = '';
 
   @override
@@ -39,9 +41,29 @@ class _DashboardViewState extends State<DashboardView> {
       final apps = await JobService.fetchApplications(userId: userId);
       final alertsList = await AlertService.fetchAlerts(userId);
 
+      // Safe alert list filtering and sorting
+      final activeAlerts = alertsList.where((a) => a['isSent'] == false).toList();
+      activeAlerts.sort((a, b) {
+        final aDate = DateTime.tryParse(a['alertDate'] ?? '') ?? DateTime.now();
+        final bDate = DateTime.tryParse(b['alertDate'] ?? '') ?? DateTime.now();
+        return aDate.compareTo(bDate);
+      });
+      final topAlerts = activeAlerts.take(3).toList();
+
+      // Safe applications sorting
+      final sortedApps = List<Map<String, dynamic>>.from(apps);
+      sortedApps.sort((a, b) {
+        final aDate = DateTime.tryParse(a['applicationDate'] ?? '') ?? DateTime.now();
+        final bDate = DateTime.tryParse(b['applicationDate'] ?? '') ?? DateTime.now();
+        return bDate.compareTo(aDate); // Descending order (recent first)
+      });
+      final recentApps = sortedApps.take(4).toList();
+
       setState(() {
         _applications = apps;
-        _alerts = alertsList.where((a) => a['isSent'] == false).toList();
+        _alerts = activeAlerts;
+        _topAlerts = topAlerts;
+        _recentApps = recentApps;
         _isLoading = false;
       });
     } catch (e) {
@@ -82,20 +104,8 @@ class _DashboardViewState extends State<DashboardView> {
     final rejectedCount = _applications.where((a) => a['status'] == 'Rejected').length;
     final withdrawnCount = _applications.where((a) => a['status'] == 'Withdrawn').length;
 
-    // Get top 3 upcoming alerts
-    _alerts.sort((a, b) => DateTime.parse(a['alertDate']).compareTo(DateTime.parse(b['alertDate'])));
-    final topAlerts = _alerts.take(3).toList();
-
-    // Get 4 most recent applications
-    _applications.sort((a, b) {
-      final aDateStr = a['applicationDate'] ?? '';
-      final bDateStr = b['applicationDate'] ?? '';
-      if (aDateStr.isEmpty) return 1;
-      if (bDateStr.isEmpty) return -1;
-      return DateTime.parse(bDateStr).compareTo(DateTime.parse(aDateStr));
-    });
-    final recentApps = _applications.take(4).toList();
-
+    final topAlerts = _topAlerts;
+    final recentApps = _recentApps;
     final userName = widget.user['name'] ?? 'User';
 
     return SingleChildScrollView(
@@ -427,7 +437,7 @@ class _DashboardViewState extends State<DashboardView> {
                 itemCount: alertsList.length,
                 itemBuilder: (context, index) {
                   final alert = alertsList[index];
-                  final alertDate = DateTime.parse(alert['alertDate']);
+                  final alertDate = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
                   final now = DateTime.now();
                   final difference = alertDate.difference(now).inDays;
 

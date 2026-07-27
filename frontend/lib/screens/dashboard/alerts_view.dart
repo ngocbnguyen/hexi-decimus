@@ -70,7 +70,7 @@ class _AlertsViewState extends State<AlertsView> {
     final now = DateTime.now();
     setState(() {
       _filteredAlerts = _allAlerts.where((alert) {
-        final alertDate = DateTime.parse(alert['alertDate']);
+        final alertDate = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
         final isSent = alert['isSent'] ?? false;
         final differenceInDays = alertDate.difference(now).inDays;
 
@@ -325,7 +325,7 @@ class _AlertsViewState extends State<AlertsView> {
             ].map((tabName) {
               final isSelected = _selectedTab == tabName;
               final count = _allAlerts.where((alert) {
-                final date = DateTime.parse(alert['alertDate']);
+                final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
                 final isSent = alert['isSent'] ?? false;
                 final difference = date.difference(DateTime.now()).inDays;
 
@@ -369,7 +369,7 @@ class _AlertsViewState extends State<AlertsView> {
                           itemCount: _filteredAlerts.length,
                           itemBuilder: (context, index) {
                             final alert = _filteredAlerts[index];
-                            final date = DateTime.parse(alert['alertDate']);
+                            final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
                             final now = DateTime.now();
                             final difference = date.difference(now).inDays;
 
