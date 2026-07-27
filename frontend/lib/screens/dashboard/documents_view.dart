@@ -286,122 +286,125 @@ class _DocumentsViewState extends State<DocumentsView> {
     final transcriptCount = _allDocuments.where((d) => d['documentType'] == 'Transcript').length;
     final certificateCount = _allDocuments.where((d) => d['documentType'] == 'Certificate').length;
 
-    return Column(
-      children: [
-        // Action Header
-        Padding(
-          padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Search documents...',
-                    prefixIcon: Icon(Icons.search),
-                    contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          // Action Header
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search documents...',
+                      prefixIcon: Icon(Icons.search),
+                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              ElevatedButton.icon(
-                onPressed: _showUploadDialog,
-                icon: const Icon(Icons.upload_file, size: 20),
-                label: const Text('Upload File'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                const SizedBox(width: 16),
+                ElevatedButton.icon(
+                  onPressed: _showUploadDialog,
+                  icon: const Icon(Icons.upload_file, size: 20),
+                  label: const Text('Upload File'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-
-        // Grid/Row Folder cards matching Wireframe 4
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-          child: Row(
-            children: [
-              Expanded(child: _buildFolderCard('Resume', resumeCount, Icons.description, Colors.blue)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildFolderCard('Cover Letter', coverLetterCount, Icons.mail_outline, Colors.purple)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildFolderCard('Transcript', transcriptCount, Icons.school_outlined, Colors.orange)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildFolderCard('Certificate', certificateCount, Icons.card_membership_outlined, Colors.green)),
-            ],
-          ),
-        ),
-
-        // Files List Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '📂 Active Folder: $_selectedCategory',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ],
             ),
           ),
-        ),
-
-        // List of Documents in active folder
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _errorMessage.isNotEmpty
-                  ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
-                  : _filteredDocuments.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.folder_zip_outlined, size: 56, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text('No documents in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
-                            ],
+  
+          // Grid/Row Folder cards matching Wireframe 4
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+            child: Row(
+              children: [
+                Expanded(child: _buildFolderCard('Resume', resumeCount, Icons.description, Colors.blue)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildFolderCard('Cover Letter', coverLetterCount, Icons.mail_outline, Colors.purple)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildFolderCard('Transcript', transcriptCount, Icons.school_outlined, Colors.orange)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildFolderCard('Certificate', certificateCount, Icons.card_membership_outlined, Colors.green)),
+              ],
+            ),
+          ),
+  
+          // Files List Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '📂 Active Folder: $_selectedCategory',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+  
+          // List of Documents in active folder
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage.isNotEmpty
+                    ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
+                    : _filteredDocuments.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.folder_zip_outlined, size: 56, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text('No documents in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                            itemCount: _filteredDocuments.length,
+                            itemBuilder: (context, index) {
+                              final doc = _filteredDocuments[index];
+                              final date = DateTime.tryParse(doc['uploadedAt'] ?? '') ?? DateTime.now();
+                              final dateStr = '${date.month}/${date.day}/${date.year}';
+  
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 12.0),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                elevation: 1,
+                                child: ListTile(
+                                  leading: const CircleAvatar(
+                                    backgroundColor: Colors.redAccent,
+                                    child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
+                                  ),
+                                  title: Text(
+                                    doc['fileName'] ?? '',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text('Uploaded: $dateStr'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.download, color: Colors.blueAccent),
+                                        onPressed: () => _downloadDocument(doc['documentId']),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                                        onPressed: () => _deleteDocument(doc['documentId']),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                          itemCount: _filteredDocuments.length,
-                          itemBuilder: (context, index) {
-                            final doc = _filteredDocuments[index];
-                            final date = DateTime.tryParse(doc['uploadedAt'] ?? '') ?? DateTime.now();
-                            final dateStr = '${date.month}/${date.day}/${date.year}';
-
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12.0),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 1,
-                              child: ListTile(
-                                leading: const CircleAvatar(
-                                  backgroundColor: Colors.redAccent,
-                                  child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 20),
-                                ),
-                                title: Text(
-                                  doc['fileName'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('Uploaded: $dateStr'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.download, color: Colors.blueAccent),
-                                      onPressed: () => _downloadDocument(doc['documentId']),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                                      onPressed: () => _deleteDocument(doc['documentId']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 

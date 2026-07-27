@@ -285,152 +285,155 @@ class _AlertsViewState extends State<AlertsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Title banner & Quick action
-        Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Follow Up Alerts',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-              ElevatedButton.icon(
-                onPressed: _showAddAlertSheet,
-                icon: const Icon(Icons.alarm_add, size: 20),
-                label: const Text('Add Alert'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          // Title banner & Quick action
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Follow Up Alerts',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                 ),
-              ),
-            ],
-          ),
-        ),
-
-        // Filter tabs
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Row(
-            children: [
-              'Upcoming',
-              'Due Today',
-              'Overdue',
-              'Completed',
-            ].map((tabName) {
-              final isSelected = _selectedTab == tabName;
-              final count = _allAlerts.where((alert) {
-                final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
-                final isSent = alert['isSent'] ?? false;
-                final difference = date.difference(DateTime.now()).inDays;
-
-                if (tabName == 'Completed') return isSent;
-                if (tabName == 'Due Today') return !isSent && difference == 0;
-                if (tabName == 'Overdue') return !isSent && difference < 0;
-                return !isSent && difference > 0;
-              }).length;
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                child: ChoiceChip(
-                  label: Text('$tabName ($count)'),
-                  selected: isSelected,
-                  onSelected: (_) => _onTabSelected(tabName),
+                ElevatedButton.icon(
+                  onPressed: _showAddAlertSheet,
+                  icon: const Icon(Icons.alarm_add, size: 20),
+                  label: const Text('Add Alert'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
                 ),
-              );
-            }).toList(),
+              ],
+            ),
           ),
-        ),
 
-        // Alerts List
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _errorMessage.isNotEmpty
-                  ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
-                  : _filteredAlerts.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text('No reminders in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
-                            ],
+          // Filter tabs
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              children: [
+                'Upcoming',
+                'Due Today',
+                'Overdue',
+                'Completed',
+              ].map((tabName) {
+                final isSelected = _selectedTab == tabName;
+                final count = _allAlerts.where((alert) {
+                  final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
+                  final isSent = alert['isSent'] ?? false;
+                  final difference = date.difference(DateTime.now()).inDays;
+
+                  if (tabName == 'Completed') return isSent;
+                  if (tabName == 'Due Today') return !isSent && difference == 0;
+                  if (tabName == 'Overdue') return !isSent && difference < 0;
+                  return !isSent && difference > 0;
+                }).length;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: ChoiceChip(
+                    label: Text('$tabName ($count)'),
+                    selected: isSelected,
+                    onSelected: (_) => _onTabSelected(tabName),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+
+          // Alerts List
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage.isNotEmpty
+                    ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
+                    : _filteredAlerts.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text('No reminders in this folder.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                            itemCount: _filteredAlerts.length,
+                            itemBuilder: (context, index) {
+                              final alert = _filteredAlerts[index];
+                              final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
+                              final now = DateTime.now();
+                              final difference = date.difference(now).inDays;
+
+                              String daysText;
+                              Color statusColor;
+                              if (alert['isSent'] == true) {
+                                daysText = 'Completed / Sent';
+                                statusColor = Colors.grey;
+                              } else if (difference < 0) {
+                                daysText = 'Overdue by ${difference.abs()} days';
+                                statusColor = Colors.redAccent;
+                              } else if (difference == 0) {
+                                daysText = 'Due Today';
+                                statusColor = Colors.orange;
+                              } else {
+                                daysText = 'In $difference days';
+                                statusColor = Colors.green;
+                              }
+
+                              // Match linked application
+                              final app = _applications.firstWhere(
+                                (a) => a['applicationId'] == alert['applicationId'],
+                                orElse: () => <String, dynamic>{},
+                              );
+                              final subtitlePrefix = app.isNotEmpty
+                                  ? '${app['companyName']} (${app['jobTitle']}) • '
+                                  : '';
+
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 12.0),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: statusColor.withOpacity(0.1),
+                                    child: Icon(Icons.notifications_active_outlined, color: statusColor, size: 20),
+                                  ),
+                                  title: Text(
+                                    alert['message'] ?? 'Follow up reminder',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text('$subtitlePrefix$daysText'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '${date.month}/${date.day}',
+                                        style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                                        onPressed: () => _deleteAlert(alert['alertId']),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                          itemCount: _filteredAlerts.length,
-                          itemBuilder: (context, index) {
-                            final alert = _filteredAlerts[index];
-                            final date = DateTime.tryParse(alert['alertDate'] ?? '') ?? DateTime.now();
-                            final now = DateTime.now();
-                            final difference = date.difference(now).inDays;
-
-                            String daysText;
-                            Color statusColor;
-                            if (alert['isSent'] == true) {
-                              daysText = 'Completed / Sent';
-                              statusColor = Colors.grey;
-                            } else if (difference < 0) {
-                              daysText = 'Overdue by ${difference.abs()} days';
-                              statusColor = Colors.redAccent;
-                            } else if (difference == 0) {
-                              daysText = 'Due Today';
-                              statusColor = Colors.orange;
-                            } else {
-                              daysText = 'In $difference days';
-                              statusColor = Colors.green;
-                            }
-
-                            // Match linked application
-                            final app = _applications.firstWhere(
-                              (a) => a['applicationId'] == alert['applicationId'],
-                              orElse: () => <String, dynamic>{},
-                            );
-                            final subtitlePrefix = app.isNotEmpty
-                                ? '${app['companyName']} (${app['jobTitle']}) • '
-                                : '';
-
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12.0),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: statusColor.withOpacity(0.1),
-                                  child: Icon(Icons.notifications_active_outlined, color: statusColor, size: 20),
-                                ),
-                                title: Text(
-                                  alert['message'] ?? 'Follow up reminder',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('$subtitlePrefix$daysText'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '${date.month}/${date.day}',
-                                      style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                                      onPressed: () => _deleteAlert(alert['alertId']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -322,128 +322,131 @@ class _ApplicationsViewState extends State<ApplicationsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Action Bar (Search & Add button)
-        Padding(
-          padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Search applications...',
-                    prefixIcon: Icon(Icons.search),
-                    contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          // Action Bar (Search & Add button)
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search applications...',
+                      prefixIcon: Icon(Icons.search),
+                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              ElevatedButton.icon(
-                onPressed: _showAddApplicationSheet,
-                icon: const Icon(Icons.add, size: 20),
-                label: const Text('Add Job'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                const SizedBox(width: 16),
+                ElevatedButton.icon(
+                  onPressed: _showAddApplicationSheet,
+                  icon: const Icon(Icons.add, size: 20),
+                  label: const Text('Add Job'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        // Horizontal filter tags
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Row(
-            children: [
-              'All',
-              'In Progress',
-              'Interview',
-              'Offer',
-              'Rejected',
-              'Withdrawn',
-            ].map((filter) {
-              final count = filter == 'All'
-                  ? _allApplications.length
-                  : _allApplications.where((a) => a['status'] == filter).length;
-              final isSelected = _selectedFilter == filter;
+          // Horizontal filter tags
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              children: [
+                'All',
+                'In Progress',
+                'Interview',
+                'Offer',
+                'Rejected',
+                'Withdrawn',
+              ].map((filter) {
+                final count = filter == 'All'
+                    ? _allApplications.length
+                    : _allApplications.where((a) => a['status'] == filter).length;
+                final isSelected = _selectedFilter == filter;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                child: ChoiceChip(
-                  label: Text('$filter ($count)'),
-                  selected: isSelected,
-                  onSelected: (_) => _onFilterTabSelected(filter),
-                ),
-              );
-            }).toList(),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: ChoiceChip(
+                    label: Text('$filter ($count)'),
+                    selected: isSelected,
+                    onSelected: (_) => _onFilterTabSelected(filter),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
-        ),
 
-        // Applications List
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _errorMessage.isNotEmpty
-                  ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
-                  : _filteredApplications.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.assignment_late_outlined, size: 56, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text('No applications found.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                          itemCount: _filteredApplications.length,
-                          itemBuilder: (context, index) {
-                            final app = _filteredApplications[index];
-                            final date = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
-                            final dateStr = '${date.month}/${date.day}/${date.year}';
+          // Applications List
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage.isNotEmpty
+                    ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
+                    : _filteredApplications.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.assignment_late_outlined, size: 56, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text('No applications found.', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                            itemCount: _filteredApplications.length,
+                            itemBuilder: (context, index) {
+                              final app = _filteredApplications[index];
+                              final date = DateTime.tryParse(app['applicationDate'] ?? '') ?? DateTime.now();
+                              final dateStr = '${date.month}/${date.day}/${date.year}';
 
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 12.0),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 1,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                  child: Text(
-                                    (app['companyName'] ?? 'C')[0].toUpperCase(),
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 12.0),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                elevation: 1,
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                    child: Text(
+                                      (app['companyName'] ?? 'C')[0].toUpperCase(),
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
+                                  title: Text(
+                                    app['companyName'] ?? '',
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text('${app['jobTitle'] ?? ''} • Applied $dateStr'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildStatusTag(app['status'] ?? 'In Progress'),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                        onPressed: () => _deleteApplication(app['applicationId']),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                title: Text(
-                                  app['companyName'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('${app['jobTitle'] ?? ''} • Applied $dateStr'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _buildStatusTag(app['status'] ?? 'In Progress'),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                      onPressed: () => _deleteApplication(app['applicationId']),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-        ),
-      ],
+                              );
+                            },
+                          ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -14,6 +14,7 @@ class DashboardShell extends StatefulWidget {
 
 class _DashboardShellState extends State<DashboardShell> {
   int _currentIndex = 0;
+  Map<String, dynamic>? _user;
 
   void _navigateToTab(int index) {
     setState(() {
@@ -22,18 +23,52 @@ class _DashboardShellState extends State<DashboardShell> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Extract user details passed as route arguments from login/register screens
-    final Map<String, dynamic> user = (ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?) 
-        ?? {'userId': 1, 'name': 'Ngoc', 'email': 'student@gsu.edu'};
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_user == null) {
+      _user = (ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?) 
+          ?? {'userId': 1, 'name': 'Ngoc', 'email': 'student@gsu.edu'};
+    }
+  }
 
-    // Navigation pages mapping to tabs
-    final List<Widget> pages = [
-      DashboardView(user: user, onNavigateToTab: _navigateToTab),
-      ApplicationsView(user: user),
-      AlertsView(user: user),
-      DocumentsView(user: user),
-    ];
+  @override
+  Widget build(BuildContext context) {
+    final user = _user!;
+
+    Widget currentPage;
+    switch (_currentIndex) {
+      case 0:
+        currentPage = DashboardView(
+          key: const ValueKey('dashboard'),
+          user: user,
+          onNavigateToTab: _navigateToTab,
+        );
+        break;
+      case 1:
+        currentPage = ApplicationsView(
+          key: const ValueKey('applications'),
+          user: user,
+        );
+        break;
+      case 2:
+        currentPage = AlertsView(
+          key: const ValueKey('alerts'),
+          user: user,
+        );
+        break;
+      case 3:
+        currentPage = DocumentsView(
+          key: const ValueKey('documents'),
+          user: user,
+        );
+        break;
+      default:
+        currentPage = DashboardView(
+          key: const ValueKey('dashboard'),
+          user: user,
+          onNavigateToTab: _navigateToTab,
+        );
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -67,9 +102,8 @@ class _DashboardShellState extends State<DashboardShell> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
+      body: SizedBox.expand(
+        child: currentPage,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
